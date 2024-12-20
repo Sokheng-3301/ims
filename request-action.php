@@ -1,103 +1,28 @@
 <?php
-    #DB connection
-    require_once('ims-db-connection.php');
-    include_once('login-check.php');
+    # Connection to DATABASE
+    require_once('../ims-db-connection.php');
 
-    // if(isset($_POST['submit'])){
-    //     $id = $_POST['id'];
-    //     $q = $_POST['q'];
-    //     $status = mysqli_real_escape_string($conn, $_POST['status']);
-    //     $comment = mysqli_real_escape_string($conn, $_POST['comment']);
+    #Check login 
+    include_once('std-login-check.php');
+    $student_id = $_SESSION['LOGIN_STDID'];
 
-    //     if($status == ''){
-    //         header("locatoin: ".SITEURL. "request-detail.php?q=".$q);
+    if(!empty($_GET['remove'])){
+        $_SESSION['REMOVE_REQUEST'] = $_GET['remove'];
+        header("Location:".SITEURL."ims-student/request-letter.php");
+        exit(0);
+    }
 
-    //     }else{
-    //         $feedback = mysqli_query($conn, "UPDATE requests SET 
-    //                                         feedback ='$status', 
-    //                                         comment = '$comment' WHERE id ='". $id ."'");
-    //         if($feedback == true){
-    //             $_SESSION['ADD_DONE'] = 'Feedback to student has completed.';
-    //             header("Location:".SITEURL."request-detail.php?q=". $q);
-    //             exit;
-    //         }else{
-    //             $_SESSION['ADD_NOT_DONE'] = 'Feedback to student has completed.';
-    //             header("Location:".SITEURL."request-detail.php?q=".$q);
-    //             exit;
-    //         }
-    //     }
-    // }
-
-    if(isset($_POST['feedback'])){
-        $id = $_POST['id'];
-        $comment = mysqli_real_escape_string($conn, $_POST['comment']);
-        if($comment == ''){
-            header("location: ".SITEURL. "request-detail.php?q=".$id);
-            exit;
+    if(!empty($_GET['delete'])){
+        $id = $_GET['delete'];
+        $delete = mysqli_query($conn, "DELETE FROM requests WHERE student_id ='". $student_id ."' AND id ='". $id ."'");
+        if($delete == true){
+            $_SESSION['ADD_DONE'] = 'Your request has removed.';
+            header("Location:".SITEURL."ims-student/request-letter.php");
+            exit(0);
         }else{
-            $feedback = mysqli_query($conn, "UPDATE requests SET 
-                                            comment = '$comment' WHERE id ='". $id ."'");
-            if($feedback == true){
-                $_SESSION['ADD_DONE'] = 'Feedback to student has completed.';
-                header("Location:".SITEURL."request-detail.php?q=". $id);
-                exit;
-            }else{
-                $_SESSION['ADD_NOT_DONE'] = 'Feedback to student has not completed.';
-                header("Location:".SITEURL."request-detail.php?q=".$id);
-                exit;
-            }
+            $_SESSION['ADD_DONE_ERROR'] = 'Your request has not removed.';
+            header("Location:".SITEURL."ims-student/request-letter.php");
+            exit(0);
         }
-
-    }
-    if(isset($_GET['accept'])){
-        $id = $_GET['accept'];
-
-        $feedback = mysqli_query($conn, "UPDATE requests SET 
-                                            feedback = 'accepted' WHERE id ='". $id ."'");
-            if($feedback == true){
-                $_SESSION['ADD_DONE'] = 'Request has accepted.';
-                header("Location:".SITEURL."request-detail.php?q=". $id);
-                exit;
-            }else{
-                $_SESSION['ADD_NOT_DONE'] = 'Request has not accepted.';
-                header("Location:".SITEURL."request-detail.php?q=".$id);
-                exit;
-            }
-    }
-    if(isset($_GET['reject'])){
-        $id = $_GET['reject'];
-
-        $feedback = mysqli_query($conn, "UPDATE requests SET 
-                                            feedback = 'rejected',
-                                            request_status = '2'
-                                             WHERE id ='". $id ."'");
-            if($feedback == true){
-                $_SESSION['ADD_DONE'] = 'Request has rejected.';
-                header("Location:".SITEURL."request-detail.php?q=". $id);
-                exit;
-            }else{
-                $_SESSION['ADD_NOT_DONE'] = 'Request has not rejected.';
-                header("Location:".SITEURL."request-detail.php?q=".$id);
-                exit;
-            }
-    }
-
-    if(isset($_GET['done'])){
-        $id = $_GET['done'];
-        $comment = 'និស្សិតអាចមកដកយកឯកសារដែលស្នើសុំនៅការិយាល័យសិក្សានិងកិច្ចការនិស្សិតនៃវិទ្យាស្ថានបច្ចេកវិទ្យាកំពង់ស្ពឺបានចាប់ពីថ្ងៃនេះតទៅ។';
-        $feedback = mysqli_query($conn, "UPDATE requests SET 
-                                            request_status = '1',
-                                            feedback = 'Done',
-                                            comment = '$comment'
-                                            WHERE id ='". $id ."'");
-            if($feedback == true){
-                $_SESSION['ADD_DONE'] = 'Request has done.';
-                header("Location:".SITEURL."request-detail.php?q=". $id);
-                exit;
-            }else{
-                $_SESSION['ADD_NOT_DONE'] = 'Request has not done.';
-                header("Location:".SITEURL."request-detail.php?q=".$id);
-                exit;
-            }
     }
 ?>
